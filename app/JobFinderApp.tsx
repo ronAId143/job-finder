@@ -1,39 +1,36 @@
 
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from 'react';
 
 export default function JobFinderApp() {
-  const [resumeText, setResumeText] = useState("");
+  const [resumeText, setResumeText] = useState('');
   const [jobResults, setJobResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const exampleJobs = [
     {
-      title: "Product Manager - AI Tools",
-      company: "OpenAI",
-      link: "https://openai.com/careers/product-manager",
+      title: 'Product Manager - AI Tools',
+      company: 'OpenAI',
+      link: 'https://openai.com/careers/product-manager',
       matchScore: 87,
       contact: {
-        name: "Jane Doe",
-        title: "Director of Product",
-        linkedin: "https://linkedin.com/in/janedoe"
-      }
+        name: 'Jane Doe',
+        title: 'Director of Product',
+        linkedin: 'https://linkedin.com/in/janedoe',
+      },
     },
     {
-      title: "UX Designer",
-      company: "Google",
-      link: "https://careers.google.com/jobs/ux-designer",
+      title: 'UX Designer',
+      company: 'Google',
+      link: 'https://careers.google.com/jobs/ux-designer',
       matchScore: 75,
       contact: {
-        name: "Mark Lee",
-        title: "UX Lead",
-        linkedin: "https://linkedin.com/in/marklee"
-      }
-    }
+        name: 'Mark Lee',
+        title: 'UX Lead',
+        linkedin: 'https://linkedin.com/in/marklee',
+      },
+    },
   ];
 
   const findJobs = () => {
@@ -60,50 +57,37 @@ Warm regards,
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">🔍 AI Job Finder</h1>
-      <p className="mb-2 text-gray-600">Paste your resume text below. We'll match it with current job postings and show you who to contact.</p>
-      <Input
-        placeholder="Paste your resume here..."
-        className="mb-4"
+    <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
+      <h1 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '16px' }}>🔍 AI Job Finder</h1>
+      <p style={{ marginBottom: '8px', color: '#555' }}>Paste your resume text below. We'll match it with current job postings and show you who to contact.</p>
+      <textarea
+        placeholder='Paste your resume here...'
+        rows={6}
+        style={{ width: '100%', padding: '8px', marginBottom: '16px', border: '1px solid #ccc', borderRadius: '4px' }}
         value={resumeText}
         onChange={(e) => setResumeText(e.target.value)}
       />
-      <Button onClick={findJobs} disabled={loading}>
-        {loading ? "Searching..." : "Find Jobs"}
-      </Button>
+      <button onClick={findJobs} disabled={loading} style={{ padding: '8px 16px', background: '#111', color: '#fff', border: 'none', borderRadius: '4px' }}>
+        {loading ? 'Searching...' : 'Find Jobs'}
+      </button>
 
-      <div className="mt-6">
+      <div style={{ marginTop: '32px' }}>
         {jobResults.map((job, index) => (
-          <Card key={index} className="mb-4">
-            <CardContent className="p-4">
-              <h2 className="text-xl font-semibold">{job.title} @ {job.company}</h2>
-              <p className="text-sm text-gray-500">Match Score: {job.matchScore}%</p>
-              <a
-                href={job.link}
-                className="text-blue-600 underline text-sm"
-                target="_blank"
-              >
-                View Job Posting
-              </a>
-              <div className="mt-2">
-                <p className="font-medium">Contact: {job.contact.name} – {job.contact.title}</p>
-                <a
-                  href={job.contact.linkedin}
-                  className="text-blue-500 text-sm underline"
-                  target="_blank"
-                >
-                  LinkedIn Profile
-                </a>
-                <details className="mt-2">
-                  <summary className="cursor-pointer text-sm text-gray-600">Cold Email Template</summary>
-                  <pre className="text-xs bg-gray-100 p-2 mt-1 rounded">
+          <div key={index} style={{ border: '1px solid #ddd', padding: '16px', borderRadius: '8px', marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 'bold' }}>{job.title} @ {job.company}</h2>
+            <p style={{ fontSize: '14px', color: '#777' }}>Match Score: {job.matchScore}%</p>
+            <a href={job.link} target='_blank' rel='noreferrer' style={{ color: '#0066cc', fontSize: '14px' }}>View Job Posting</a>
+            <div style={{ marginTop: '8px' }}>
+              <p><strong>Contact:</strong> {job.contact.name} – {job.contact.title}</p>
+              <a href={job.contact.linkedin} target='_blank' rel='noreferrer' style={{ color: '#0066cc', fontSize: '14px' }}>LinkedIn Profile</a>
+              <details style={{ marginTop: '8px' }}>
+                <summary style={{ cursor: 'pointer', fontSize: '14px', color: '#444' }}>Cold Email Template</summary>
+                <pre style={{ background: '#f9f9f9', padding: '8px', borderRadius: '4px', fontSize: '12px' }}>
 {getEmailTemplate(job.contact.name, job.contact.title, job.company, job.title)}
-                  </pre>
-                </details>
-              </div>
-            </CardContent>
-          </Card>
+                </pre>
+              </details>
+            </div>
+          </div>
         ))}
       </div>
     </div>
