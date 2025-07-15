@@ -1,3 +1,4 @@
+
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
@@ -17,11 +18,11 @@ const openai = new OpenAI({
 });
 
 async function scrapeJobsWithPuppeteer(url, company, selector) {
-    const browser = await puppeteer.launch({
-      headless: true,
-      executablePath: puppeteer.executablePath(),
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: puppeteer.executablePath(),
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
   const page = await browser.newPage();
   try {
     await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
@@ -101,5 +102,5 @@ ${job.description}`
 });
 
 app.listen(port, () => {
-  console.log(`✅ Puppeteer backend running on port ${port}`);
+  console.log(`Puppeteer-based backend running on port ${port}`);
 });
