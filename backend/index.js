@@ -50,8 +50,6 @@ app.post('/upload', async (req, res) => {
     { company: 'Disney', url: 'https://jobs.disneycareers.com/search-jobs', selector: '.job-title a' },
     { company: 'Warner Bros', url: 'https://careers.wbd.com/global/en/search-results', selector: 'a.job-title-link' },
     { company: 'Universal', url: 'https://www.nbcunicareers.com/search-results', selector: 'a.job-title' },
-    { company: 'Sony', url: 'https://www.sonypicturesjobs.com/jobs', selector: 'a.jobTitle-link' },
-    { company: 'HBO', url: 'https://careers.warnermediagroup.com/global/en/search-results', selector: 'a.job-title-link' },
     { company: 'Apple', url: 'https://jobs.apple.com/en-us/search', selector: 'div.table-row a' }
   ];
 
