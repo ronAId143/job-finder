@@ -1,8 +1,7 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-const axios = require('axios');
-const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 require('dotenv').config();
 
 const app = express();
@@ -17,27 +16,33 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-async function fetchJobs(company, url, selector) {
-  const jobs = [];
+async function scrapeJobsWithPuppeteer(url, company, selector) {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+  const page = await browser.newPage();
   try {
-    const res = await axios.get(url);
-    const $ = cheerio.load(res.data);
-    $(selector).each((_, el) => {
-      const title = $(el).text().trim();
-      const link = $(el).attr('href') || url;
-      jobs.push({
-        title: title,
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+    await page.waitForSelector(selector, { timeout: 10000 });
+    const jobs = await page.evaluate((selector, company) => {
+      const elements = Array.from(document.querySelectorAll(selector));
+      return elements.slice(0, 10).map(el => ({
+        title: el.innerText.trim(),
         company: company,
-        description: `${title} role at ${company}`,
-        link: link.startsWith('http') ? link : url,
+        description: `${el.innerText.trim()} role at ${company}`,
+        link: el.href || '',
         primary: '',
         secondary: ''
-      });
-    });
+      }));
+    }, selector, company);
+    await browser.close();
+    return jobs;
   } catch (err) {
-    console.error(`${company} job scrape failed:`, err.message);
+    console.error(`${company} Puppeteer scrape error:`, err.message);
+    await browser.close();
+    return [];
   }
-  return jobs;
 }
 
 app.post('/upload', async (req, res) => {
@@ -46,6 +51,7 @@ app.post('/upload', async (req, res) => {
   }
 
   const resumeText = req.files.resume.data.toString('utf8');
+
   const jobSources = [
     { company: 'Disney', url: 'https://jobs.disneycareers.com/search-jobs', selector: '.job-title a' },
     { company: 'Warner Bros', url: 'https://careers.wbd.com/global/en/search-results', selector: 'a.job-title-link' },
@@ -55,7 +61,7 @@ app.post('/upload', async (req, res) => {
 
   let allJobs = [];
   for (const source of jobSources) {
-    const jobs = await fetchJobs(source.company, source.url, source.selector);
+    const jobs = await scrapeJobsWithPuppeteer(source.url, source.company, source.selector);
     allJobs.push(...jobs);
   }
 
@@ -81,18 +87,18 @@ ${job.description}`
       });
 
       const score = parseInt(response.choices[0].message.content.trim());
-      job.score = isNaN(score) ? 'N/A' : score + '%';
-      matches.push(job); // push all jobs regardless of score
+      if (score >= 25) {
+        job.score = score + '%';
+        matches.push(job);
+      }
     } catch (err) {
       console.error('OpenAI match failed:', err.message);
-      job.score = 'N/A';
-      matches.push(job);
     }
   }
 
-  return res.json({ debug: true, extracted: JSON.stringify({ jobs: matches }) });
+  return res.json({ extracted: JSON.stringify({ jobs: matches }) });
 });
 
 app.listen(port, () => {
-  console.log(`Backend running in debug mode on port ${port}`);
+  console.log(`Puppeteer-based backend running on port ${port}`);
 });
