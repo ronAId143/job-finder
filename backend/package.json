@@ -1,5 +1,5 @@
 {
-  "name": "job-finder-backend-puppeteer",
+  "name": "job-finder-backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

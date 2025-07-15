@@ -100,5 +100,5 @@ ${job.description}`
 });
 
 app.listen(port, () => {
-  console.log(`Puppeteer-based backend running on port ${port}`);
+  console.log(`✅ Puppeteer backend running on port ${port}`);
 });
