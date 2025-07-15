@@ -12,10 +12,9 @@ app.use(cors());
 app.use(fileUpload());
 app.use(express.json());
 
-const openaiApiKey = process.env.OPENAI_API_KEY;
 const OpenAI = require('openai');
 const openai = new OpenAI({
-  apiKey: openaiApiKey
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 async function fetchJobs(company, url, selector) {
@@ -24,12 +23,12 @@ async function fetchJobs(company, url, selector) {
     const res = await axios.get(url);
     const $ = cheerio.load(res.data);
     $(selector).each((_, el) => {
-      const title = $(el).find('h3, h2').text().trim() || $(el).text().trim();
+      const title = $(el).text().trim();
       const link = $(el).attr('href') || url;
       jobs.push({
         title: title,
         company: company,
-        description: title + ' role at ' + company,
+        description: `${title} role at ${company}`,
         link: link.startsWith('http') ? link : url,
         primary: '',
         secondary: ''
@@ -47,13 +46,13 @@ app.post('/upload', async (req, res) => {
   }
 
   const resumeText = req.files.resume.data.toString('utf8');
-
   const jobSources = [
-    { company: 'Netflix', url: 'https://jobs.netflix.com/search?q=ai', selector: 'a[data-testid="job-link"]' },
     { company: 'Disney', url: 'https://jobs.disneycareers.com/search-jobs', selector: '.job-title a' },
     { company: 'Warner Bros', url: 'https://careers.wbd.com/global/en/search-results', selector: 'a.job-title-link' },
-    { company: 'Paramount', url: 'https://www.paramount.com/careers/job-opportunities', selector: 'a.job-link' },
-    { company: 'Universal', url: 'https://www.nbcunicareers.com/search-results', selector: 'a.job-title' }
+    { company: 'Universal', url: 'https://www.nbcunicareers.com/search-results', selector: 'a.job-title' },
+    { company: 'Sony', url: 'https://www.sonypicturesjobs.com/jobs', selector: 'a.jobTitle-link' },
+    { company: 'HBO', url: 'https://careers.warnermediagroup.com/global/en/search-results', selector: 'a.job-title-link' },
+    { company: 'Apple', url: 'https://jobs.apple.com/en-us/search', selector: 'div.table-row a' }
   ];
 
   let allJobs = [];
@@ -65,7 +64,7 @@ app.post('/upload', async (req, res) => {
   const matches = [];
   for (const job of allJobs) {
     try {
-      const response = await openai.createChatCompletion({
+      const response = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
           {
@@ -83,7 +82,7 @@ ${job.description}`
         ]
       });
 
-      const score = parseInt(response.data.choices[0].message.content.trim());
+      const score = parseInt(response.choices[0].message.content.trim());
       if (score >= 25) {
         job.score = score + '%';
         matches.push(job);
