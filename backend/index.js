@@ -40,12 +40,12 @@ app.post('/upload', async (req, res) => {
 
     const resumeText = await extractTextFromFile(req.files.resume);
 
-    const prompt = \`
+    const prompt = `
 Extract and summarize the following resume into a list of skills, job titles, and relevant keywords. Respond in JSON format with keys: "skills", "titles", "keywords".
 
-\n\nResume:
-\${resumeText}
-\`;
+Resume:
+${resumeText}
+`;
 
     const response = await openai.createChatCompletion({
       model: 'gpt-4',
