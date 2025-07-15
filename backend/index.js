@@ -81,18 +81,18 @@ ${job.description}`
       });
 
       const score = parseInt(response.choices[0].message.content.trim());
-      if (score >= 25) {
-        job.score = score + '%';
-        matches.push(job);
-      }
+      job.score = isNaN(score) ? 'N/A' : score + '%';
+      matches.push(job); // push all jobs regardless of score
     } catch (err) {
       console.error('OpenAI match failed:', err.message);
+      job.score = 'N/A';
+      matches.push(job);
     }
   }
 
-  return res.json({ extracted: JSON.stringify({ jobs: matches }) });
+  return res.json({ debug: true, extracted: JSON.stringify({ jobs: matches }) });
 });
 
 app.listen(port, () => {
-  console.log(`Backend running on port ${port}`);
+  console.log(`Backend running in debug mode on port ${port}`);
 });
