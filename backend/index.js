@@ -56,8 +56,8 @@ ${resumeText}
     const result = response.choices[0].message.content;
     res.json({ extracted: result });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to process resume' });
+    console.error('Resume processing failed:', err);
+    res.status(500).json({ error: 'Failed to process resume', details: err.message });
   }
 });
 
