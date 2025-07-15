@@ -1,0 +1,1 @@
+Frontend with dashboard-style light theme and job card UI.
