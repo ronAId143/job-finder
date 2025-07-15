@@ -25,7 +25,7 @@ const JobFinderApp = () => {
     setSubmitted(true);
 
     try {
-      const res = await fetch('https://job-finder-backend-rp4p.onrender.com/upload', {
+      const res = await fetch('https://job-finder-backend-dnmj.onrender.com/upload', {
         method: 'POST',
         body: formData,
       });
