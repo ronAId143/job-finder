@@ -13,9 +13,10 @@ app.use(fileUpload());
 app.use(express.json());
 
 const openaiApiKey = process.env.OPENAI_API_KEY;
-const { Configuration, OpenAIApi } = require('openai');
-const configuration = new Configuration({ apiKey: openaiApiKey });
-const openai = new OpenAIApi(configuration);
+const OpenAI = require('openai');
+const openai = new OpenAI({
+  apiKey: openaiApiKey
+});
 
 async function fetchJobs(company, url, selector) {
   const jobs = [];
