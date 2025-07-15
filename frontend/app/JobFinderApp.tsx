@@ -7,6 +7,7 @@ const JobFinderApp = () => {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -21,6 +22,7 @@ const JobFinderApp = () => {
     formData.append('resume', file);
     setLoading(true);
     setError(null);
+    setSubmitted(true);
 
     try {
       const res = await fetch('https://job-finder-tu2m.onrender.com/upload', {
@@ -32,9 +34,13 @@ const JobFinderApp = () => {
 
       if (data.extracted) {
         const parsed = JSON.parse(data.extracted);
-        setJobs(parsed.jobs || []);
+        if (parsed.jobs && parsed.jobs.length > 0) {
+          setJobs(parsed.jobs);
+        } else {
+          setError('No matching jobs found.');
+        }
       } else {
-        setError(data.error || 'Failed to process response.');
+        setError(data.error || 'Failed to process resume.');
       }
     } catch (err) {
       setError('Upload failed or backend not responding.');
@@ -59,6 +65,9 @@ const JobFinderApp = () => {
       </div>
 
       <div>
+        {!loading && submitted && jobs.length === 0 && !error && (
+          <p>No job matches found yet.</p>
+        )}
         {jobs.map((job, index) => (
           <div key={index} style={{
             background: 'white', marginBottom: '1rem', padding: '1rem',
