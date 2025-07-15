@@ -4,7 +4,7 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
-const { Configuration, OpenAIApi } = require('openai');
+const OpenAI = require('openai');
 const cors = require('cors');
 const path = require('path');
 
@@ -15,10 +15,9 @@ app.use(cors());
 app.use(fileUpload());
 app.use(express.json());
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
-const openai = new OpenAIApi(configuration);
 
 async function extractTextFromFile(file) {
   const ext = path.extname(file.name).toLowerCase();
@@ -48,13 +47,13 @@ Resume:
 ${resumeText}
 `;
 
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3,
+      temperature: 0.3
     });
 
-    const result = response.data.choices[0].message.content;
+    const result = response.choices[0].message.content;
     res.json({ extracted: result });
   } catch (err) {
     console.error(err);
