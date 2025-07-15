@@ -39,7 +39,6 @@ app.post('/upload', async (req, res) => {
     }
 
     const resumeText = await extractTextFromFile(req.files.resume);
-
     const prompt = `
 Extract and summarize the following resume into a list of skills, job titles, and relevant keywords. Respond in JSON format with keys: "skills", "titles", "keywords".
 
@@ -56,7 +55,7 @@ ${resumeText}
     const result = response.choices[0].message.content;
     res.json({ extracted: result });
   } catch (err) {
-    console.error('Resume processing failed:', err);
+    console.error("Resume processing failed:", err);
     res.status(500).json({ error: 'Failed to process resume', details: err.message });
   }
 });
