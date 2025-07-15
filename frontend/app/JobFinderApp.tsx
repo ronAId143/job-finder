@@ -26,7 +26,7 @@ export default function JobFinderApp() {
     formData.append('resume', resumeFile);
 
     try {
-      const res = await fetch('https://your-backend-url.onrender.com/upload', {
+      const res = await fetch('https://job-finder-tu2m.onrender.com', {
         method: 'POST',
         body: formData,
       });
